@@ -55,7 +55,10 @@ PROMPT TO EVALUATE:
       ]
     });
 
-    const reply = response.choices[0].message.content;
+    let reply = response.choices[0].message.content.trim();
+
+    // Remove GPT formatting quirks like backticks or markdown
+    reply = reply.replace(/^```json|^```|```$/g, '').trim();
 
     let json;
     try {
@@ -63,7 +66,7 @@ PROMPT TO EVALUATE:
     } catch (err) {
       console.error("⚠️ GPT returned invalid JSON:", reply);
       json = {
-        feedback: "Oops! I couldn’t quite make sense of your prompt. Try adding more detail?",
+        feedback: "Oops! I couldn’t quite make sense of your prompt. Try again with a bit more detail.",
         score: 1
       };
     }
