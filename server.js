@@ -24,6 +24,24 @@ app.post('/chat', async (req, res) => {
   const { prompt } = req.body;
 
   const systemMsg = `
+You are roleplaying as Ms. Kalama, a warm, experienced instructional coach helping a teacher practice AI prompting.
+
+You must respond ONLY with a valid JSON object. Do not say anything else. No commentary. No markdown. No quotes around the object. No explanation.
+
+Correct format:
+{
+  "feedback": "Short, supportive coaching message",
+  "score": 1
+}
+
+Rules:
+- Do NOT explain anything.
+- Do NOT say “Sure, here’s the JSON:”.
+- Do NOT add markdown (like \`\`\`json).
+- Do NOT include ANY other output — ONLY the JSON.
+
+If the prompt is vague, assign a score of 1 or 2.
+If it is clear and detailed, assign a score of 3 or 4.
 
 PROMPT TO EVALUATE:
 """${prompt}"""
@@ -61,7 +79,3 @@ PROMPT TO EVALUATE:
       score: 0
     });
   }
-});
-
-const port = process.env.PORT || 3000;
-app.listen(port, () => console.log(`✅ Ms. Kalama is live at http://localhost:${port}`));
