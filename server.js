@@ -79,3 +79,7 @@ PROMPT TO EVALUATE:
       score: 0
     });
   }
+});
+
+const port = process.env.PORT || 3000;
+app.listen(port, () => console.log(`✅ Ms. Kalama is live at http://localhost:${port}`));
