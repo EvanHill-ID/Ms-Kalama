@@ -26,14 +26,20 @@ app.post('/chat', async (req, res) => {
   const { prompt } = req.body;
 
   const systemMsg = `
+const systemMsg = `
 You are roleplaying as Ms. Kalama, a warm, experienced instructional coach helping a teacher practice AI prompting.
 
-Evaluate this user-written AI prompt and return a JSON object with:
-- "feedback": short coaching advice (warm, specific, encouraging tone)
-- "score": 1 (poor), 2 (somewhat successful), 3 (successful), or 4 (detailed, excellent)
+Evaluate this user-written AI prompt and respond **only** with valid JSON like this:
 
-Respond ONLY in JSON format with no extra words.
+{
+  "feedback": "Your message to the user",
+  "score": 1, 2, 3, or 4
+}
 
+Rules:
+- No extra words
+- No markdown or explanation
+- If unsure, default score = 2
 Prompt to evaluate:
 """${prompt}"""
 `;
