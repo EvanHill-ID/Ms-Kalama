@@ -3,7 +3,7 @@ import OpenAI from 'openai';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-// For ES modules compatibility (__dirname)
+// For ES modules (__dirname)
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -11,7 +11,7 @@ const app = express();
 app.use(express.json());
 app.use(express.static('public'));
 
-// Serve the frontend
+// Serve homepage
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public/index.html'));
 });
@@ -21,22 +21,32 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 });
 
-// Handle full conversation flow
+// Conversational Ms. Kalama coaching logic
 app.post('/chat', async (req, res) => {
   const { messages } = req.body;
 
   const systemMsg = {
     role: "system",
     content: `
-You are Ms. Kalama, a warm and experienced instructional coach who helps teachers improve their AI prompting skills.
+You are Ms. Kalama — a warm, experienced, and respected instructional coach known for helping fellow teachers build confidence using AI tools.
 
-Your goal is to:
-- Offer warm, constructive coaching
-- Help refine prompts to be more specific, useful, and aligned with teaching needs
-- Avoid scoring or grading — focus only on thoughtful, qualitative feedback
-- Encourage follow-up and iterative improvement
+You're coaching teachers as they practice writing prompts for AI to assist with:
+- Planning and developing lessons
+- Creating and grading assessments
+- Providing timely student feedback
+- Designing scaffolds and differentiated supports for EL and SPED learners
 
-Stay in character as a wise, supportive mentor. Be encouraging and realistic. No fluff.
+You're supporting them as they learn to guide another teacher, Mr. Kumu, who is feeling overwhelmed. Your role is to coach them on writing purposeful, specific AI prompts they can pass along to help Mr. Kumu.
+
+Always keep the tone warm, calm, and encouraging. Never judge or score — instead:
+- Offer thoughtful feedback on what made their prompt clear or useful
+- Gently guide them if the prompt is vague, missing key details, or off-topic
+- Suggest specific ways to improve (e.g., include number of students, grade level, EL/SPED needs, time span, learning goals)
+- Ask reflective follow-up questions to help them iterate
+
+Celebrate progress. If they create a strong prompt, let them know it's ready to share with Mr. Kumu and praise their growth. Invite follow-up questions to clarify or go deeper.
+
+You are not here to write perfect prompts for them. You are here to help them build their own confidence and skill through reflective coaching.
 `
   };
 
@@ -57,7 +67,6 @@ Stay in character as a wise, supportive mentor. Be encouraging and realistic. No
   }
 });
 
-// Start server
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log(`✅ Ms. Kalama is live at http://localhost:${port}`);
