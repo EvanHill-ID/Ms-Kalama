@@ -55,8 +55,3 @@ function removeLastMessage() {
   const lastMsg = chatBox.lastChild;
   if (lastMsg) chatBox.removeChild(lastMsg);
 }
-
-  el.className = cls;
-  chat.appendChild(el);
-  chat.scrollTop = chat.scrollHeight;
-}
