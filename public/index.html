@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -22,7 +21,7 @@
       color: #D16D2F;
     }
 
-    #chat {
+    #chat-box {
       background: #fffdf9;
       border: 1px solid #f2d0b3;
       border-radius: 20px;
@@ -33,18 +32,18 @@
       box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
     }
 
-    .user {
+    .user-message {
       color: #0056a2;
       font-weight: 600;
       margin-bottom: 0.5rem;
     }
 
-    .bot {
+    .bot-message {
       color: #2f844f;
       margin-bottom: 1rem;
     }
 
-    #input {
+    #user-input {
       width: 70%;
       padding: 12px;
       border: none;
@@ -76,9 +75,13 @@
 </head>
 <body>
   <h1>Ms. Kalama Prompt Coach</h1>
-  <div id="chat"></div>
-  <input id="input" placeholder="Type your prompt..." />
-  <button id="send">Send</button>
+  <div id="chat-box"></div>
+
+  <form>
+    <input id="user-input" placeholder="Type your prompt..." />
+    <button id="send">Send</button>
+  </form>
+
   <script src="script.js"></script>
 </body>
 </html>
