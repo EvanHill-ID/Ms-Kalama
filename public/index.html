@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <title>Ms. Kalama Prompt Coach</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
   <style>
     body {
-      font-family: 'Poppins', sans-serif;
-      background: linear-gradient(to bottom right, #fef6e4, #fde3c8);
+      font-family: 'Open Sans', sans-serif;
+      background: linear-gradient(to bottom right, #fdf6e3, #fbe3c1);
       color: #333;
-      max-width: 700px;
+      max-width: 640px;
       margin: 2rem auto;
       padding: 20px;
       border-radius: 20px;
@@ -21,12 +21,24 @@
       color: #D16D2F;
     }
 
+    .kalama-avatar {
+      text-align: center;
+      margin-bottom: 15px;
+    }
+
+    .kalama-avatar img {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      border: 3px solid #F79464;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+
     #chat-box {
-      background: #fffdf9;
-      border: 1px solid #f2d0b3;
-      border-radius: 20px;
+      background: #EBE4CE;
+      border-radius: 15px;
       padding: 1rem;
-      height: 400px;
+      height: 300px;
       overflow-y: auto;
       margin-bottom: 1rem;
       box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
@@ -51,12 +63,12 @@
       background-color: #F79464;
       color: #fff;
       font-size: 16px;
-      font-family: 'Poppins', sans-serif;
+      font-family: 'Open Sans', sans-serif;
       box-shadow: 0 2px 4px rgba(0,0,0,0.1);
       outline: none;
     }
 
-    #send {
+    button {
       padding: 12px 18px;
       margin-left: 10px;
       background-color: #2e8b57;
@@ -65,22 +77,28 @@
       color: white;
       font-size: 16px;
       cursor: pointer;
-      font-family: 'Poppins', sans-serif;
+      font-family: 'Open Sans', sans-serif;
     }
 
-    #send:hover {
+    button:hover {
       background-color: #246c45;
     }
   </style>
 </head>
 <body>
   <h1>Ms. Kalama Prompt Coach</h1>
+  <div class="kalama-avatar">
+    <img src="kalama.jpg" alt="Ms. Kalama" />
+  </div>
   <div id="chat-box"></div>
-
   <form>
     <input id="user-input" placeholder="Type your prompt..." />
-    <button id="send">Send</button>
+    <button type="submit">Send</button>
   </form>
+  <script src="script.js"></script>
+</body>
+</html>
+
 
   <script src="script.js"></script>
 </body>
