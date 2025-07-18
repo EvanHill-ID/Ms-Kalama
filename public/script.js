@@ -34,9 +34,15 @@ form.addEventListener("submit", async (e) => {
     addMessage("Ms. Kalama", data.reply);
     messages.push({ role: "assistant", content: data.reply });
 
-    // ✅ If response is marked complete, signal to Storyline
-    if (data.complete === true && typeof parent.SetPlayerVariable === "function") {
-      parent.SetPlayerVariable("ChatComplete", true);
+    // ✅ Safe trigger for Storyline variable
+    if (data.complete === true) {
+      try {
+        if (typeof parent.SetPlayerVariable === "function") {
+          parent.SetPlayerVariable("ChatComplete", true);
+        }
+      } catch (err) {
+        console.warn("SetPlayerVariable failed (not in Storyline?):", err.message);
+      }
     }
 
   } catch (err) {
