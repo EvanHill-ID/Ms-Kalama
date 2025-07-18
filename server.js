@@ -25,38 +25,31 @@ const openai = new OpenAI({
 app.post('/chat', async (req, res) => {
   const { messages } = req.body;
 
-  // Analyze the latest user message for key elements
+  // Analyze latest user message
   const latestUserMessage = messages[messages.length - 1]?.content?.toLowerCase() || "";
 
   const hasGrade = /\b(5th|fifth|grade|classroom)\b/.test(latestUserMessage);
-  const hasTopic = /main idea|text structure|lesson|reading|writing|math|science/.test(latestUserMessage);
-  const hasSupport = /english learners|iep|sped|differentiation|support/.test(latestUserMessage);
+  const hasTopic = /main idea|text structure|lesson|reading|writing|math|science|shakespeare/.test(latestUserMessage);
+  const hasSupport = /english learners|elp|iep|sped|differentiation|support/.test(latestUserMessage);
 
   const isComplete = hasGrade && hasTopic && hasSupport;
 
   const systemMsg = {
     role: "system",
     content: `
-You are Ms. Kalama — a warm, experienced, and respected instructional coach known for helping fellow teachers build confidence using AI tools.
+You are Ms. Kalama — a warm, supportive instructional coach helping teachers practice writing better AI prompts.
 
-You're coaching teachers as they practice writing prompts for AI to assist with:
-- Planning and developing lessons
-- Creating and grading assessments
-- Providing timely student feedback
-- Designing scaffolds and differentiated supports for EL and SPED learners
+✅ Keep responses SHORT and FRIENDLY: 2–3 sentences max.
 
-You're supporting them as they learn to guide another teacher, Mr. Kumu, who is feeling overwhelmed. Your role is to coach them on writing purposeful, specific AI prompts they can pass along to help Mr. Kumu.
+Your role is to:
+- Give thoughtful encouragement
+- Suggest **one improvement** if needed
+- End with a reflective question when helpful
 
-Always keep the tone warm, calm, and encouraging. Never judge or score — instead:
-- Offer thoughtful feedback on what made their prompt clear or useful
-- Gently guide them if the prompt is vague, missing key details, or off-topic
-- Suggest specific ways to improve (e.g., include number of students, grade level, EL/SPED needs, time span, learning goals)
-- Ask reflective follow-up questions to help them iterate
+Avoid rewriting the user's prompt. Do not explain AI in detail. Speak like a coach, not a chatbot.
 
-Celebrate progress. If they create a strong prompt, let them know it's ready to share with Mr. Kumu and praise their growth. Invite follow-up questions to clarify or go deeper.
-
-You are not here to write perfect prompts for them. You are here to help them build their own confidence and skill through reflective coaching.
-`
+If the prompt is already strong, just affirm it, praise their growth, and tell them they’re ready to move on.
+    `
   };
 
   try {
@@ -65,7 +58,12 @@ You are not here to write perfect prompts for them. You are here to help them bu
       messages: [systemMsg, ...messages]
     });
 
-    const reply = response.choices[0].message.content.trim();
+    let reply = response.choices[0].message.content.trim();
+
+    // Override with custom final message if complete
+    if (isComplete) {
+      reply = "This version is thoughtful and well-structured — great job! Don’t forget to copy or jot down this prompt. You’ll revisit it in your final reflection. Ready to move on? Click ‘Continue’ when you are.";
+    }
 
     res.json({
       reply,
@@ -85,4 +83,3 @@ const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log(`✅ Ms. Kalama is live at http://localhost:${port}`);
 });
-
