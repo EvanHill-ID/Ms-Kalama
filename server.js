@@ -25,6 +25,15 @@ const openai = new OpenAI({
 app.post('/chat', async (req, res) => {
   const { messages } = req.body;
 
+  // Analyze the latest user message for key elements
+  const latestUserMessage = messages[messages.length - 1]?.content?.toLowerCase() || "";
+
+  const hasGrade = /\b(5th|fifth|grade|classroom)\b/.test(latestUserMessage);
+  const hasTopic = /main idea|text structure|lesson|reading|writing|math|science/.test(latestUserMessage);
+  const hasSupport = /english learners|iep|sped|differentiation|support/.test(latestUserMessage);
+
+  const isComplete = hasGrade && hasTopic && hasSupport;
+
   const systemMsg = {
     role: "system",
     content: `
@@ -57,12 +66,17 @@ You are not here to write perfect prompts for them. You are here to help them bu
     });
 
     const reply = response.choices[0].message.content.trim();
-    res.json({ reply });
+
+    res.json({
+      reply,
+      complete: isComplete
+    });
 
   } catch (err) {
     console.error("❌ OpenAI API error:", err.message);
     res.status(500).json({
-      reply: "Oops! Something went wrong. Please try again shortly."
+      reply: "Oops! Something went wrong. Please try again shortly.",
+      complete: false
     });
   }
 });
@@ -71,3 +85,4 @@ const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log(`✅ Ms. Kalama is live at http://localhost:${port}`);
 });
+
