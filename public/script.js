@@ -34,6 +34,11 @@ form.addEventListener("submit", async (e) => {
     addMessage("Ms. Kalama", data.reply);
     messages.push({ role: "assistant", content: data.reply });
 
+    // ✅ If response is marked complete, signal to Storyline
+    if (data.complete === true && typeof parent.SetPlayerVariable === "function") {
+      parent.SetPlayerVariable("ChatComplete", true);
+    }
+
   } catch (err) {
     console.error("Error:", err);
     removeLastMessage();
