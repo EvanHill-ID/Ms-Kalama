@@ -1,8 +1,7 @@
 const form = document.querySelector("form");
-const chatBox = document.getElementById("chat");
+const chatBox = document.getElementById("chat-container");
 const input = document.getElementById("user-input");
 const sendButton = document.getElementById("send-button");
-const continueBtn = document.getElementById("continue-btn");
 
 let messages = [];
 
@@ -27,39 +26,46 @@ sendButton.addEventListener("click", async () => {
 
     removeLastMessage();
 
-    if (data.reply) {
-      addMessage("Ms. Kalama", data.reply);
-      messages.push({ role: "assistant", content: data.reply });
+    // Format response to bold "ChatGPT Response:" and show spacing
+    const formatted = data.reply.replace(
+      /ChatGPT Response:/,
+      "<br><br><strong>ChatGPT Response:</strong>"
+    );
 
-      // Storyline trigger if prompt is considered complete
-      if (data.complete === true) {
-        try {
-          if (typeof parent.SetPlayerVariable === "function") {
-            parent.SetPlayerVariable("ChatComplete", true);
-          }
-        } catch (err) {
-          console.warn("SetPlayerVariable failed:", err.message);
+    addMessage("Ms. Kalama", formatted);
+    messages.push({ role: "assistant", content: data.reply });
+
+    if (data.complete === true) {
+      try {
+        if (typeof parent.SetPlayerVariable === "function") {
+          parent.SetPlayerVariable("ChatComplete", true);
         }
-        continueBtn.style.display = "block";
+      } catch (err) {
+        console.warn("SetPlayerVariable failed (not in Storyline?):", err.message);
       }
-    } else if (data.error) {
-      addMessage("Ms. Kalama", `Error: ${data.error}`);
     }
+
   } catch (err) {
-    console.error("Client-side error:", err);
+    console.error("Error:", err);
     removeLastMessage();
-    addMessage("Ms. Kalama", `Error: ${err.message}`);
+    addMessage("Ms. Kalama", "Oops, something went wrong. Please try again.");
   }
 });
 
+// Helper to add messages to the chat UI
 function addMessage(sender, text) {
   const msg = document.createElement("div");
   msg.className = sender === "You" ? "user-message" : "bot-message";
-  msg.innerHTML = `<strong>${sender}:</strong> ${text}`;
+  
+  // Convert line breaks to <br> for HTML rendering
+  const formattedText = text.replace(/\n/g, "<br>");
+  msg.innerHTML = `<strong>${sender}:</strong> ${formattedText}`;
+  
   chatBox.appendChild(msg);
   chatBox.scrollTop = chatBox.scrollHeight;
 }
 
+// Remove the last message (e.g. Typing...)
 function removeLastMessage() {
   const lastMsg = chatBox.lastChild;
   if (lastMsg) chatBox.removeChild(lastMsg);
