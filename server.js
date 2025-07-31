@@ -6,7 +6,7 @@ import { OpenAI } from "openai";
 const app = express();
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-app.use(cors());
+app.use(express.static("public"));
 app.use(bodyParser.json());
 
 app.post("/chat", async (req, res) => {
