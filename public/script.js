@@ -5,6 +5,14 @@ const sendButton = document.getElementById("send-button");
 
 let messages = [];
 
+// Submit on Enter key
+input.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") {
+    e.preventDefault();
+    sendButton.click();
+  }
+});
+
 sendButton.addEventListener("click", async () => {
   const userPrompt = input.value.trim();
   if (!userPrompt) return;
@@ -26,11 +34,10 @@ sendButton.addEventListener("click", async () => {
 
     removeLastMessage();
 
-    // Format response to bold "ChatGPT Response:" and show spacing
-    const formatted = data.reply.replace(
-      /ChatGPT Response:/,
-      "<br><br><strong>ChatGPT Response:</strong>"
-    );
+    // Format reply: bold "ChatGPT Response" and add paragraph spacing
+    const formatted = data.reply
+      .replace("ChatGPT Response:", "<br><br><strong>ChatGPT Response:</strong>")
+      .replace(/\n/g, "<br>");
 
     addMessage("Ms. Kalama", formatted);
     messages.push({ role: "assistant", content: data.reply });
@@ -56,16 +63,15 @@ sendButton.addEventListener("click", async () => {
 function addMessage(sender, text) {
   const msg = document.createElement("div");
   msg.className = sender === "You" ? "user-message" : "bot-message";
-  
-  // Convert line breaks to <br> for HTML rendering
+
   const formattedText = text.replace(/\n/g, "<br>");
   msg.innerHTML = `<strong>${sender}:</strong> ${formattedText}`;
-  
+
   chatBox.appendChild(msg);
   chatBox.scrollTop = chatBox.scrollHeight;
 }
 
-// Remove the last message (e.g. Typing...)
+// Remove last message (used for Typing...)
 function removeLastMessage() {
   const lastMsg = chatBox.lastChild;
   if (lastMsg) chatBox.removeChild(lastMsg);
