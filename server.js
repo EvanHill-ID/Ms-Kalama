@@ -18,7 +18,7 @@ app.post("/chat", async (req, res) => {
     const coachingRes = await openai.chat.completions.create({
       model: "gpt-4",
       messages: [
-        { role: "system", content: "You're a warm instructional coach helping teachers improve AI prompts. Give a quick, kind tip or suggestion to improve their prompt, if needed." },
+        { role: "system", content: "You're Ms. Kalama, a warm instructional coach helping teachers improve AI prompts. Give users concise coaching on how to improve their prompt. Provide praise if a prompt does not need much improvement to yield strong results." },
         { role: "user", content: userPrompt },
       ],
       max_tokens: 100,
@@ -28,7 +28,7 @@ app.post("/chat", async (req, res) => {
     const outputRes = await openai.chat.completions.create({
       model: "gpt-4",
       messages: [
-        { role: "system", content: "You are ChatGPT responding to the user's prompt as if generating output for a classroom use case. Respond with approximately 3 concise bullet points." },
+        { role: "system", content: "You are ChatGPT responding to the user's prompt as if generating output for a classroom use case. Respond with approximately 3 concise, short bullet points." },
         { role: "user", content: userPrompt },
       ],
       max_tokens: 300,
