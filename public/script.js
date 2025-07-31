@@ -1,19 +1,11 @@
 const form = document.querySelector("form");
 const chatBox = document.getElementById("chat-container");
 const input = document.getElementById("user-input");
-const sendButton = document.getElementById("send-button");
+const sendBtn = document.getElementById("send-button");
 
 let messages = [];
 
-// Submit on Enter key
-input.addEventListener("keydown", (e) => {
-  if (e.key === "Enter") {
-    e.preventDefault();
-    sendButton.click();
-  }
-});
-
-sendButton.addEventListener("click", async () => {
+sendBtn.addEventListener("click", async () => {
   const userPrompt = input.value.trim();
   if (!userPrompt) return;
 
@@ -34,13 +26,12 @@ sendButton.addEventListener("click", async () => {
 
     removeLastMessage();
 
-    // Format reply: bold "ChatGPT Response" and add paragraph spacing
-    const formatted = data.reply
-      .replace("ChatGPT Response:", "<br><br><strong>ChatGPT Response:</strong>")
-      .replace(/\n/g, "<br>");
+    const combinedReply = `${data.coaching.trim()}
 
-    addMessage("Ms. Kalama", formatted);
-    messages.push({ role: "assistant", content: data.reply });
+<strong>ChatGPT Response:</strong> ${data.output.trim()}`;
+    addMessage("Ms. Kalama", combinedReply);
+
+    messages.push({ role: "assistant", content: data.coaching + "\n\n" + data.output });
 
     if (data.complete === true) {
       try {
@@ -51,7 +42,6 @@ sendButton.addEventListener("click", async () => {
         console.warn("SetPlayerVariable failed (not in Storyline?):", err.message);
       }
     }
-
   } catch (err) {
     console.error("Error:", err);
     removeLastMessage();
@@ -59,19 +49,14 @@ sendButton.addEventListener("click", async () => {
   }
 });
 
-// Helper to add messages to the chat UI
 function addMessage(sender, text) {
   const msg = document.createElement("div");
   msg.className = sender === "You" ? "user-message" : "bot-message";
-
-  const formattedText = text.replace(/\n/g, "<br>");
-  msg.innerHTML = `<strong>${sender}:</strong> ${formattedText}`;
-
+  msg.innerHTML = `<strong>${sender}:</strong> ${text}`;
   chatBox.appendChild(msg);
   chatBox.scrollTop = chatBox.scrollHeight;
 }
 
-// Remove last message (used for Typing...)
 function removeLastMessage() {
   const lastMsg = chatBox.lastChild;
   if (lastMsg) chatBox.removeChild(lastMsg);
