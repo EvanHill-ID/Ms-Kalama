@@ -1,63 +1,73 @@
-// server.js
-
 import express from "express";
-import bodyParser from "body-parser";
 import cors from "cors";
-import OpenAI from "openai";
+import { OpenAI } from "openai";
+import path from "path";
+import { fileURLToPath } from "url";
+
+// Setup
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
-
-// Middleware
 app.use(cors());
-app.use(bodyParser.json());
-app.use(express.static("public")); // ✅ Serve frontend files from /public
+app.use(express.json());
+app.use(express.static(path.join(__dirname, "public")));
 
-// Initialize OpenAI
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-// System prompts
-const COACHING_PROMPT = {
-  role: "system",
-  content:
-    "You are Ms. Kalama, a warm and wise instructional coach who helps teachers refine their AI prompts. Your goal is to give brief, constructive coaching — ideally in 1–3 sentences — that encourages revision. Focus on clarity, specificity, and alignment with teaching goals. Do not generate any lesson plans or AI outputs. Offer 1 suggestion at a time and encourage iteration. Speak in a calm, supportive tone like a mentor."
-};
-
-const OUTPUT_PROMPT = {
-  role: "system",
-  content:
-    "You are an AI assistant for teachers. Generate a realistic, classroom-ready result based on the user's prompt — such as a lesson plan, activity, or instructional strategy. Keep it professional and practical, and avoid coaching or suggestions."
-};
-
-// Handle chat request
-app.post("/api/chat", async (req, res) => {
-  const userPrompt = req.body.prompt;
-
+// POST route for chat
+app.post("/chat", async (req, res) => {
   try {
-    const [coachingResponse, outputResponse] = await Promise.all([
-      openai.chat.completions.create({
-        model: "gpt-4",
-        messages: [COACHING_PROMPT, { role: "user", content: userPrompt }],
-      }),
-      openai.chat.completions.create({
-        model: "gpt-4",
-        messages: [OUTPUT_PROMPT, { role: "user", content: userPrompt }],
-      }),
-    ]);
+    const messages = req.body.messages || [];
+    const userPrompt = messages[messages.length - 1]?.content;
 
-    res.json({
-      coaching: coachingResponse.choices[0].message.content,
-      output: outputResponse.choices[0].message.content,
+    if (!userPrompt) {
+      return res.status(400).json({ error: "Missing user prompt." });
+    }
+
+    // Get coaching feedback
+    const coachingResponse = await openai.chat.completions.create({
+      model: "gpt-4",
+      messages: [
+        {
+          role: "system",
+          content:
+            "You are Ms. Kalama, an instructional coach helping teachers improve their AI prompts. Give succinct, specific, and positive coaching to help refine prompts for clarity, grade level, task type, and student needs. Respond in 2-3 sentences.",
+        },
+        ...messages,
+      ],
     });
-  } catch (err) {
-    console.error("OpenAI API error:", err);
-    res.status(500).json({ error: "Something went wrong with the AI request." });
+
+    const coaching = coachingResponse.choices[0].message.content.trim();
+
+    // Get example AI output
+    const outputResponse = await openai.chat.completions.create({
+      model: "gpt-4",
+      messages: [
+        {
+          role: "system",
+          content:
+            "You are an AI assistant responding to the prompt as an educational tool would. Provide a sample lesson plan, quiz, or strategy based on the prompt. Keep it short and in plain language.",
+        },
+        { role: "user", content: userPrompt },
+      ],
+    });
+
+    const output = outputResponse.choices[0].message.content.trim();
+
+    const combinedReply = `<strong>Coaching:</strong> ${coaching}<br><br><strong>AI Output:</strong> ${output}`;
+
+    res.json({ reply: combinedReply, complete: true });
+  } catch (error) {
+    console.error("Server error:", error.message);
+    res.status(500).json({ error: "Server error. Please try again later." });
   }
 });
 
 // Start server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Ms. Kalama server running on port ${PORT}`);
+  console.log(`Ms. Kalama is listening on port ${PORT}`);
 });
