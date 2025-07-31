@@ -1,68 +1,65 @@
-const form = document.querySelector("form");
-const chatBox = document.getElementById("chat-box");
-const input = document.getElementById("user-input");
+// script.js (Updated with message history + Storyline trigger)
 
-// Store all messages for multi-turn conversation
-let messages = [];
+document.addEventListener("DOMContentLoaded", () => {
+  const sendButton = document.getElementById("send-button");
+  const userInput = document.getElementById("user-input");
+  const chatBox = document.getElementById("chat");
 
-form.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const userPrompt = input.value.trim();
-  if (!userPrompt) return;
+  // Store all messages for multi-turn conversation
+  let messages = [];
 
-  // Show user message
-  addMessage("You", userPrompt);
-  messages.push({ role: "user", content: userPrompt });
-  input.value = "";
+  sendButton.addEventListener("click", async () => {
+    const prompt = userInput.value.trim();
+    if (!prompt) return;
 
-  // Show loading state
-  addMessage("Ms. Kalama", "Typing...");
+    addMessage("You", prompt);
+    messages.push({ role: "user", content: prompt });
+    userInput.value = "";
+    addMessage("Ms. Kalama", "Typing...");
 
-  try {
-    const res = await fetch("/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ messages })
-    });
+    try {
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ messages })
+      });
 
-    const data = await res.json();
+      const data = await response.json();
+      removeLastMessage();
 
-    // Remove "Typing..." placeholder
-    removeLastMessage();
+      const combinedResponse = `<strong>Coaching:</strong> ${data.coaching}<br><br><strong>AI Output:</strong> ${data.output}`;
+      addMessage("Ms. Kalama", combinedResponse);
+      messages.push({ role: "assistant", content: data.output });
 
-    // Show GPT reply
-    addMessage("Ms. Kalama", data.reply);
-    messages.push({ role: "assistant", content: data.reply });
-
-    // ✅ Safe trigger for Storyline variable
-    if (data.complete === true) {
-      try {
-        if (typeof parent.SetPlayerVariable === "function") {
-          parent.SetPlayerVariable("ChatComplete", true);
+      if (data.complete === true) {
+        try {
+          if (typeof parent.SetPlayerVariable === "function") {
+            parent.SetPlayerVariable("ChatComplete", true);
+          }
+        } catch (err) {
+          console.warn("SetPlayerVariable failed (not in Storyline?):", err.message);
         }
-      } catch (err) {
-        console.warn("SetPlayerVariable failed (not in Storyline?):", err.message);
       }
-    }
 
-  } catch (err) {
-    console.error("Error:", err);
-    removeLastMessage();
-    addMessage("Ms. Kalama", "Oops, something went wrong. Please try again later.");
+    } catch (error) {
+      console.error("Error:", error);
+      removeLastMessage();
+      addMessage("Ms. Kalama", "Oops, something went wrong. Please try again.");
+    }
+  });
+
+  function addMessage(sender, text) {
+    const message = document.createElement("div");
+    message.className = `message ${sender === "You" ? "user" : "bot"}`;
+    message.innerHTML = `<strong>${sender}:</strong> ${text}`;
+    chatBox.appendChild(message);
+    chatBox.scrollTop = chatBox.scrollHeight;
+  }
+
+  function removeLastMessage() {
+    const lastMsg = chatBox.lastChild;
+    if (lastMsg) chatBox.removeChild(lastMsg);
   }
 });
-
-// Helper to add messages to the chat UI
-function addMessage(sender, text) {
-  const msg = document.createElement("div");
-  msg.className = sender === "You" ? "user-message" : "bot-message";
-  msg.innerHTML = `<strong>${sender}:</strong> ${text}`;
-  chatBox.appendChild(msg);
-  chatBox.scrollTop = chatBox.scrollHeight;
-}
-
-// Helper to remove the last message (used to remove "Typing...")
-function removeLastMessage() {
-  const lastMsg = chatBox.lastChild;
-  if (lastMsg) chatBox.removeChild(lastMsg);
-}
