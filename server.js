@@ -6,10 +6,13 @@ import cors from "cors";
 import OpenAI from "openai";
 
 const app = express();
+
+// Middleware
 app.use(cors());
 app.use(bodyParser.json());
+app.use(express.static("public")); // ✅ Serve frontend files from /public
 
-// Initialize OpenAI with API key from Render environment
+// Initialize OpenAI
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
@@ -27,7 +30,7 @@ const OUTPUT_PROMPT = {
     "You are an AI assistant for teachers. Generate a realistic, classroom-ready result based on the user's prompt — such as a lesson plan, activity, or instructional strategy. Keep it professional and practical, and avoid coaching or suggestions."
 };
 
-// Endpoint to receive user prompt and return coaching + output
+// Handle chat request
 app.post("/api/chat", async (req, res) => {
   const userPrompt = req.body.prompt;
 
@@ -53,7 +56,7 @@ app.post("/api/chat", async (req, res) => {
   }
 });
 
-// Start the server
+// Start server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Ms. Kalama server running on port ${PORT}`);
