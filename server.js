@@ -1,89 +1,65 @@
-import express from 'express';
-import OpenAI from 'openai';
-import path from 'path';
-import { fileURLToPath } from 'url';
+// server.js
 
-// For ES modules (__dirname)
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const express = require("express");
+const bodyParser = require("body-parser");
+const cors = require("cors");
+const { Configuration, OpenAIApi } = require("openai");
 
 const app = express();
-app.use(express.json());
-app.use(express.static('public'));
+app.use(cors());
+app.use(bodyParser.json());
 
-// Serve homepage
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public/index.html'));
+const configuration = new Configuration({
+  apiKey: process.env.OPENAI_API_KEY, // Store this securely
 });
+const openai = new OpenAIApi(configuration);
 
-// Initialize OpenAI SDK
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
-});
+// System prompts
+const COACHING_PROMPT = {
+  role: "system",
+  content:
+    "You are Ms. Kalama, a warm and wise instructional coach who helps teachers refine their AI prompts. Your goal is to give brief, constructive coaching — ideally in 1–3 sentences — that encourages revision. Focus on clarity, specificity, and alignment with teaching goals. Do not generate any lesson plans or AI outputs. Offer 1 suggestion at a time and encourage iteration. Speak in a calm, supportive tone like a mentor."
+};
 
-// Conversational Ms. Kalama coaching logic
-app.post('/chat', async (req, res) => {
-  const { messages } = req.body;
+const OUTPUT_PROMPT = {
+  role: "system",
+  content:
+    "You are an AI assistant for teachers. Generate a realistic, classroom-ready result based on the user's prompt — such as a lesson plan, activity, or instructional strategy. Keep it professional and practical, and avoid coaching or suggestions."
+};
 
-  // Analyze latest user message
-  const latestUserMessage = messages[messages.length - 1]?.content?.toLowerCase() || "";
-
-  const hasGrade = /\b(5th|fifth|grade|classroom)\b/.test(latestUserMessage);
-  const hasTopic = /main idea|text structure|lesson|reading|writing|math|science|shakespeare/.test(latestUserMessage);
-  const hasSupport = /english learners|elp|iep|sped|differentiation|support/.test(latestUserMessage);
-
-  const isComplete = hasGrade && hasTopic && hasSupport;
-
-  const systemMsg = {
-    role: "system",
-    content: `
-You are Ms. Kalama — a warm, supportive instructional coach helping teachers practice writing better AI prompts.
-
-✅ Keep responses SHORT and FRIENDLY: 2–3 sentences max.
-
-Your job is to:
-- Encourage the user in a warm, human tone
-- Suggest **one specific improvement**, if needed
-- Avoid long explanations or rewriting their prompt
-- Do NOT ask follow-up questions or try to steer the user off-topic
-
-If the prompt is vague or missing detail, use phrases like:
-- “Try adding a bit more detail about the topic or learning goal.”
-- “It would be good to include grade level and learner needs.”
-- “Consider mentioning supports for EL or IEP students.”
-
-If the prompt is already strong, affirm their work and let them know they’re ready to continue.
-    `
-  };
+// POST route to handle prompt input and return both coaching + output
+app.post("/api/chat", async (req, res) => {
+  const userPrompt = req.body.prompt;
 
   try {
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o",
-      messages: [systemMsg, ...messages]
+    // Call 1: Coaching from Ms. Kalama
+    const coachingResponse = await openai.createChatCompletion({
+      model: "gpt-4", // or gpt-3.5-turbo
+      messages: [COACHING_PROMPT, { role: "user", content: userPrompt }],
     });
 
-    let reply = response.choices[0].message.content.trim();
+    const coachingText = coachingResponse.data.choices[0].message.content;
 
-    // Override with custom final message if prompt is strong
-    if (isComplete) {
-      reply = "This version is thoughtful and well-structured — great job! 📋 Don’t forget to copy or jot down this prompt. You’ll revisit it in your final reflection. Ready to move on? Click ‘Continue’ when you are.";
-    }
+    // Call 2: AI output simulation
+    const outputResponse = await openai.createChatCompletion({
+      model: "gpt-4",
+      messages: [OUTPUT_PROMPT, { role: "user", content: userPrompt }],
+    });
 
+    const outputText = outputResponse.data.choices[0].message.content;
+
+    // Return both responses
     res.json({
-      reply,
-      complete: isComplete
+      coaching: coachingText,
+      output: outputText,
     });
-
   } catch (err) {
-    console.error("❌ OpenAI API error:", err.message);
-    res.status(500).json({
-      reply: "Oops! Something went wrong. Please try again shortly.",
-      complete: false
-    });
+    console.error("Error with OpenAI API:", err.message);
+    res.status(500).json({ error: "Something went wrong with the AI request." });
   }
 });
 
-const port = process.env.PORT || 3000;
-app.listen(port, () => {
-  console.log(`✅ Ms. Kalama is live at http://localhost:${port}`);
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Ms. Kalama server running on port ${PORT}`);
 });
