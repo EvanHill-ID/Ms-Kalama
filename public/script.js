@@ -26,9 +26,7 @@ sendBtn.addEventListener("click", async () => {
 
     removeLastMessage();
 
-    const combinedReply = `${data.coaching.trim()}
-
-<strong>ChatGPT Response:</strong> ${data.output.trim()}`;
+    const combinedReply = `${data.coaching.trim()}<br><br><strong>ChatGPT Response:</strong> ${data.output.trim()}`;
     addMessage("Ms. Kalama", combinedReply);
 
     messages.push({ role: "assistant", content: data.coaching + "\n\n" + data.output });
