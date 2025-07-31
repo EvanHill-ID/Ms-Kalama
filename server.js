@@ -1,19 +1,16 @@
-// server.js
-
 import express from "express";
 import bodyParser from "body-parser";
 import cors from "cors";
-import { Configuration, OpenAIApi } from "openai";
+import OpenAI from "openai";
 
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
 // Initialize OpenAI
-const configuration = new Configuration({
-  apiKey: process.env.OPENAI_API_KEY, // Ensure this is set in Render settings
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY, // Set in Render environment variables
 });
-const openai = new OpenAIApi(configuration);
 
 // System prompts
 const COACHING_PROMPT = {
@@ -28,38 +25,31 @@ const OUTPUT_PROMPT = {
     "You are an AI assistant for teachers. Generate a realistic, classroom-ready result based on the user's prompt — such as a lesson plan, activity, or instructional strategy. Keep it professional and practical, and avoid coaching or suggestions."
 };
 
-// POST route to handle user prompt
 app.post("/api/chat", async (req, res) => {
   const userPrompt = req.body.prompt;
 
   try {
-    // Get coaching feedback from Ms. Kalama
-    const coachingResponse = await openai.createChatCompletion({
-      model: "gpt-4",
-      messages: [COACHING_PROMPT, { role: "user", content: userPrompt }],
-    });
-
-    const coachingText = coachingResponse.data.choices[0].message.content;
-
-    // Get AI output for the user's prompt
-    const outputResponse = await openai.createChatCompletion({
-      model: "gpt-4",
-      messages: [OUTPUT_PROMPT, { role: "user", content: userPrompt }],
-    });
-
-    const outputText = outputResponse.data.choices[0].message.content;
+    const [coachingResponse, outputResponse] = await Promise.all([
+      openai.chat.completions.create({
+        model: "gpt-4",
+        messages: [COACHING_PROMPT, { role: "user", content: userPrompt }],
+      }),
+      openai.chat.completions.create({
+        model: "gpt-4",
+        messages: [OUTPUT_PROMPT, { role: "user", content: userPrompt }],
+      }),
+    ]);
 
     res.json({
-      coaching: coachingText,
-      output: outputText,
+      coaching: coachingResponse.choices[0].message.content,
+      output: outputResponse.choices[0].message.content,
     });
   } catch (err) {
-    console.error("Error with OpenAI API:", err.message);
+    console.error("OpenAI API Error:", err);
     res.status(500).json({ error: "Something went wrong with the AI request." });
   }
 });
 
-// Start server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Ms. Kalama server running on port ${PORT}`);
