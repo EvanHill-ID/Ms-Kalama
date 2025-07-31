@@ -1,3 +1,5 @@
+// server.js
+
 import express from "express";
 import bodyParser from "body-parser";
 import cors from "cors";
@@ -7,9 +9,9 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
-// Initialize OpenAI
+// Initialize OpenAI with API key from Render environment
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY, // Set in Render environment variables
+  apiKey: process.env.OPENAI_API_KEY,
 });
 
 // System prompts
@@ -25,6 +27,7 @@ const OUTPUT_PROMPT = {
     "You are an AI assistant for teachers. Generate a realistic, classroom-ready result based on the user's prompt — such as a lesson plan, activity, or instructional strategy. Keep it professional and practical, and avoid coaching or suggestions."
 };
 
+// Endpoint to receive user prompt and return coaching + output
 app.post("/api/chat", async (req, res) => {
   const userPrompt = req.body.prompt;
 
@@ -45,11 +48,12 @@ app.post("/api/chat", async (req, res) => {
       output: outputResponse.choices[0].message.content,
     });
   } catch (err) {
-    console.error("OpenAI API Error:", err);
+    console.error("OpenAI API error:", err);
     res.status(500).json({ error: "Something went wrong with the AI request." });
   }
 });
 
+// Start the server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Ms. Kalama server running on port ${PORT}`);
