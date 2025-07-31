@@ -1,22 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Ms. Kalama Chatbot</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ms. Kalama Chat</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div id="instructions">
-    <h2>👋 Welcome!</h2>
+    <h2>Welcome!</h2>
     <p>
       I'm <strong>Ms. Kalama</strong>, your instructional coach. Practice writing AI prompts to help Mr. Kumu with lesson planning, assessments, or differentiation.
       For each prompt, I’ll coach you and show what an AI tool might generate.
     </p>
 
-    <h3>📝 Example Prompt:</h3>
+    <h3>Example Prompt:</h3>
     <p><em>"Create a 5th grade lesson plan on persuasive writing that includes scaffolds for multilingual learners and students with IEPs."</em></p>
 
-    <h3>💡 Sample AI Output:</h3>
+    <h3>Sample AI Output:</h3>
     <p>
       <em>
         Lesson Title: Persuasive Writing<br />
@@ -28,11 +29,16 @@
     <p><strong>Try your own prompt below!</strong></p>
   </div>
 
-  <div id="chat-container" class="chat-box"></div>
-
-  <div id="input-area">
-    <input type="text" id="user-input" placeholder="Type your AI prompt here..." />
-    <button id="send-button">Send</button>
+  <div class="chat-container">
+    <div class="chat-header">
+      <h2>Ms. Kalama</h2>
+      <img src="Kalama.JPG" alt="Ms. Kalama" class="kalama-img">
+    </div>
+    <div id="chat" class="chat-box"></div>
+    <div class="input-area">
+      <input type="text" id="user-input" placeholder="Type your AI prompt here...">
+      <button id="send-button">Send</button>
+    </div>
   </div>
 
   <button id="continue-btn" style="display:none;">Continue</button>
