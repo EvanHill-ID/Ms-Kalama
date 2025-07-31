@@ -1,62 +1,102 @@
+/* style.css */
+
 body {
   font-family: 'Segoe UI', sans-serif;
-  background-color: #f9f9f9;
+  background: linear-gradient(to bottom right, #fef8f0, #f4ede4);
   margin: 0;
-  padding: 20px;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
 }
 
-#instructions {
-  background-color: #f0f5f5;
-  padding: 1em;
-  border-radius: 10px;
-  margin-bottom: 20px;
+.chat-container {
+  background-color: #ffffff;
+  border-radius: 20px;
+  padding: 16px;
+  width: 100%;
+  max-width: 580px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  border: 2px solid #e3e0d3;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.chat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.chat-header h2 {
+  color: #3c3a2d;
+  margin: 0;
+}
+
+.kalama-img {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #caa57b;
 }
 
 .chat-box {
-  background-color: #ffffff;
-  border: 1px solid #ccc;
+  flex: 1;
+  height: 320px;
+  overflow-y: auto;
+  border: 1px solid #dcd7ca;
   padding: 10px;
-  height: 400px;
-  overflow-y: scroll;
-  border-radius: 10px;
+  border-radius: 12px;
+  background-color: #fdfaf5;
+  font-size: 15px;
+  line-height: 1.4;
+  color: #333;
 }
 
-#input-area {
-  margin-top: 10px;
+.message {
+  margin-bottom: 12px;
+}
+
+.message.user {
+  text-align: right;
+  color: #2e6b57;
+}
+
+.message.bot {
+  text-align: left;
+  color: #613b16;
+}
+
+.input-container {
   display: flex;
   gap: 10px;
+  align-items: center;
 }
 
 #user-input {
   flex: 1;
   padding: 10px;
-  border-radius: 8px;
+  border-radius: 10px;
   border: 1px solid #ccc;
+  resize: none;
+  font-size: 14px;
+  font-family: inherit;
 }
 
 #send-button {
-  padding: 10px 20px;
-  border-radius: 8px;
+  padding: 10px 16px;
+  background-color: #fcbe5c;
+  color: #432918;
   border: none;
-  background-color: #4CAF50;
-  color: white;
+  border-radius: 10px;
+  font-weight: bold;
   cursor: pointer;
+  transition: background 0.2s ease;
 }
 
-.message {
-  margin: 10px 0;
-  padding: 10px;
-  border-radius: 8px;
-}
-
-.coach-message {
-  background-color: #e7f7ec;
-}
-
-.output-message {
-  background-color: #fff7d1;
-}
-
-.error-message {
-  color: red;
+#send-button:hover {
+  background-color: #f0a137;
 }
