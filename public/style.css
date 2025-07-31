@@ -1,0 +1,62 @@
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #f9f9f9;
+  margin: 0;
+  padding: 20px;
+}
+
+#instructions {
+  background-color: #f0f5f5;
+  padding: 1em;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+
+.chat-box {
+  background-color: #ffffff;
+  border: 1px solid #ccc;
+  padding: 10px;
+  height: 400px;
+  overflow-y: scroll;
+  border-radius: 10px;
+}
+
+#input-area {
+  margin-top: 10px;
+  display: flex;
+  gap: 10px;
+}
+
+#user-input {
+  flex: 1;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+#send-button {
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: none;
+  background-color: #4CAF50;
+  color: white;
+  cursor: pointer;
+}
+
+.message {
+  margin: 10px 0;
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.coach-message {
+  background-color: #e7f7ec;
+}
+
+.output-message {
+  background-color: #fff7d1;
+}
+
+.error-message {
+  color: red;
+}
