@@ -53,7 +53,12 @@ app.post("/chat", async (req, res) => {
 
     const complete = messages.length >= 5; // Set true after several turns
 
-    res.json({ reply: `Coaching Response:\n${coachingText}\n\n------------------------------\n\nAI Output:\n${outputText}`, complete });
+    res.json({ reply: `${coachingText}
+
+------------------------------
+
+ChatGPT Response:
+${outputText}`, complete });
   } catch (err) {
     console.error("Server error:", err);
     res.status(500).json({ reply: "Oops, something went wrong. Please try again." });
