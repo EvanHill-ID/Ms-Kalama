@@ -1,4 +1,4 @@
-// server.js
+// server.cjs
 
 const express = require("express");
 const bodyParser = require("body-parser");
