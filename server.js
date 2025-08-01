@@ -20,8 +20,7 @@ app.post("/chat", async (req, res) => {
       messages: [
         {
           role: "system",
-          content:
-            "You're Ms. Kalama, a warm instructional coach helping teachers improve AI prompts. Give users concise, brief coaching on how to improve their prompt. Provide praise if a prompt does not need much improvement to yield strong results.",
+          content: "You’re Ms. Kalama, a warm instructional coach helping teachers improve AI prompts. Keep your coaching brief and focused. Respond in 2–4 sentences only. Praise strong prompts and suggest 1–2 specific tips for improvement when needed."
         },
         { role: "user", content: userPrompt },
       ],
@@ -34,8 +33,7 @@ app.post("/chat", async (req, res) => {
       messages: [
         {
           role: "system",
-          content:
-            "You are ChatGPT responding to the user's prompt as if generating output for a classroom use case. Respond with approximately 3 concise, short bullet points. Do not number the bullet points.",
+          content: "You are ChatGPT responding to the user's prompt as if generating output for a classroom use case. Respond in no more than 3 concise bullet points. Each bullet should be short and to the point. Keep the entire response under 400 tokens."
         },
         { role: "user", content: userPrompt },
       ],
@@ -45,19 +43,14 @@ app.post("/chat", async (req, res) => {
     const coaching = coachingRes.choices?.[0]?.message?.content?.trim() || "";
     const output = outputRes.choices?.[0]?.message?.content?.trim() || "";
 
-    console.log("✅ Coaching Response:", coaching);
-    console.log("✅ Output Response:", output);
-
     res.json({
       coaching,
       output,
       complete: true,
     });
   } catch (err) {
-    console.error("❌ Error in /chat route:", err);
-    res
-      .status(500)
-      .json({ coaching: "Sorry, something went wrong.", output: "", complete: false });
+    console.error("Error in /chat route:", err);
+    res.status(500).json({ coaching: "Sorry, something went wrong.", output: "", complete: false });
   }
 });
 
@@ -65,5 +58,3 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`✅ Server running on port ${PORT}`);
 });
-
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
