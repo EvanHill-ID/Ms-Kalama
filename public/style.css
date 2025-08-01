@@ -1,33 +1,32 @@
-/* Base styles */
+/* Base body layout */
 body {
   font-family: Arial, sans-serif;
   background-color: #f0f7f4;
   color: #333;
   margin: 0;
-  padding: 20px 0;
+  padding: 20px;
   display: flex;
   justify-content: center;
-  align-items: flex-start;
-  min-height: 100vh;
 }
 
-main {
-  max-width: 600px;
-  width: 90%;
-  padding: 0 15px;
-  box-sizing: border-box;
+/* Main container for all content */
+#container {
+  max-width: 720px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
 /* Instructions section */
 #instructions {
-  background-color: #fff;
+  background-color: #ffffff;
   border-radius: 12px;
   padding: 20px;
-  margin-bottom: 20px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-/* Chat box */
+/* Chat wrapper */
 #chat-wrapper {
   background-color: #ffffff;
   border-radius: 12px;
@@ -35,13 +34,14 @@ main {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
+/* Chat container */
 #chat-container {
   max-height: 300px;
   overflow-y: auto;
   margin-bottom: 20px;
 }
 
-/* Chat messages */
+/* Chat message styles */
 .message {
   margin-bottom: 12px;
   padding: 10px;
@@ -63,7 +63,7 @@ main {
   text-align: left;
 }
 
-/* Input + buttons */
+/* Input and send button */
 #input-area {
   display: flex;
   gap: 10px;
