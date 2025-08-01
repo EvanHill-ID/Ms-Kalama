@@ -1,57 +1,78 @@
+const chatContainer = document.getElementById("chat-container");
 const userInput = document.getElementById("user-input");
 const sendButton = document.getElementById("send-button");
-const chatContainer = document.getElementById("chat-container");
-const nextButton = document.getElementById("next-btn");
+const continueButton = document.getElementById("continue-btn");
 
-function addMessage(content, className = "bot-message") {
-  const msg = document.createElement("div");
-  msg.className = className;
-  msg.innerHTML = content;
-  chatContainer.appendChild(msg);
+function appendMessage(role, content) {
+  const messageDiv = document.createElement("div");
+  messageDiv.classList.add("message", role);
+  messageDiv.innerHTML = `<strong>${role === "user" ? "You" : "Ms. Kalama"}:</strong> ${content}`;
+  chatContainer.appendChild(messageDiv);
   chatContainer.scrollTop = chatContainer.scrollHeight;
 }
 
-function addCopyButton(promptText) {
-  const copyBtn = document.createElement("button");
-  copyBtn.textContent = "Copy Prompt";
-  copyBtn.className = "copy-btn";
-  copyBtn.onclick = () => {
-    navigator.clipboard.writeText(promptText);
-    copyBtn.textContent = "Copied!";
-    setTimeout(() => (copyBtn.textContent = "Copy Prompt"), 1500);
-  };
-  chatContainer.appendChild(copyBtn);
+function appendOutput(content) {
+  const outputDiv = document.createElement("div");
+  outputDiv.classList.add("message", "output");
+  outputDiv.innerHTML = `<strong>Sample AI Output:</strong><br>${content}`;
+  chatContainer.appendChild(outputDiv);
+  chatContainer.scrollTop = chatContainer.scrollHeight;
 }
 
-sendButton.addEventListener("click", async () => {
-  const prompt = userInput.value.trim();
-  if (!prompt) return;
+function appendCopyButton(promptText) {
+  let existingButton = document.getElementById("copy-button");
+  if (existingButton) {
+    existingButton.remove();
+  }
 
-  addMessage(prompt, "user-message");
+  const copyButton = document.createElement("button");
+  copyButton.id = "copy-button";
+  copyButton.textContent = "Copy Prompt";
+  copyButton.onclick = () => {
+    navigator.clipboard.writeText(promptText);
+    copyButton.textContent = "Copied!";
+    setTimeout(() => (copyButton.textContent = "Copy Prompt"), 1500);
+  };
+
+  chatContainer.appendChild(copyButton);
+  chatContainer.scrollTop = chatContainer.scrollHeight;
+}
+
+async function sendMessage() {
+  const message = userInput.value.trim();
+  if (!message) return;
+
+  appendMessage("user", message);
   userInput.value = "";
 
   try {
     const response = await fetch("/chat", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ messages: [{ role: "user", content: prompt }] }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ messages: [{ role: "user", content: message }] }),
     });
 
-    const { coaching, output, complete } = await response.json();
+    const data = await response.json();
 
-    addMessage(`<strong>Ms. Kalama:</strong> ${coaching}`);
-    addMessage(`<strong>Sample AI Output:</strong><br><em>${output}</em>`);
-
-    if (coaching.includes("This is a strong prompt")) {
-      addCopyButton(prompt);
-      document.getElementById("next-btn").style.display = "block";
+    if (data.coaching && data.output) {
+      appendMessage("kalama", data.coaching);
+      appendOutput(data.output);
+      appendCopyButton(message);
+      if (data.complete) {
+        continueButton.style.display = "block";
+      }
+    } else {
+      appendMessage("kalama", "Something went wrong. Please try again.");
     }
   } catch (err) {
-    console.error("Chat error:", err);
-    addMessage("Something went wrong. Please try again.");
+    appendMessage("kalama", "Error connecting to the server. Please try again.");
+    console.error(err);
   }
-});
+}
 
-userInput.addEventListener("keydown", (e) => {
-  if (e.key === "Enter") sendButton.click();
+sendButton.addEventListener("click", sendMessage);
+userInput.addEventListener("keypress", (e) => {
+  if (e.key === "Enter") sendMessage();
 });
