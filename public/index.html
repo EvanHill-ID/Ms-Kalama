@@ -8,17 +8,27 @@
 </head>
 <body>
   <div class="chat-container">
+    <div class="header">
+      <h1>Practice with Ms. Kalama</h1>
+      <p>Write a helpful AI prompt to support Mr. Kumu’s classroom. When your prompt is strong, copy it and click Next.</p>
+    </div>
     <div id="chat-box" class="chat-box"></div>
+
     <form id="chat-form" class="chat-form">
       <input
         type="text"
         id="user-input"
-        placeholder="Ask Ms. Kalama something..."
+        placeholder="Type your prompt here..."
+        autocomplete="off"
         required
       />
       <button type="submit">Send</button>
     </form>
+
+    <button id="copy-button" style="display: none;">📋 Copy Prompt</button>
+    <div id="completed-message" class="completed-message"></div>
   </div>
+
   <script src="script.js"></script>
 </body>
 </html>
