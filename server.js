@@ -7,34 +7,63 @@ const app = express();
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 app.use(express.static("public"));
-app.use(cors());
 app.use(bodyParser.json());
 
 app.post("/chat", async (req, res) => {
-  const userMessage = req.body.message;
-
   try {
-    const completion = await openai.chat.completions.create({
+    const { messages } = req.body;
+    const userPrompt = messages[messages.length - 1]?.content || "";
+
+    // Coaching message
+    const coachingRes = await openai.chat.completions.create({
+      model: "gpt-4",
       messages: [
         {
           role: "system",
-          content: `You are Ms. Kalama, a wise, supportive instructional coach. You help teachers improve their AI prompts to be more useful for lesson planning, assessment, and differentiation. Your tone is encouraging and warm, like a mentor. If the user's prompt is strong — meaning it's specific, clear, and tailored to the classroom context — affirm it clearly and include this phrase in your response: "This is a strong prompt." If the prompt needs improvement, offer 1–2 supportive coaching tips to refine it. Help the teacher iterate thoughtfully, but do NOT say "This is a strong prompt" unless it truly meets the bar. Only include the strong prompt phrase ONCE per message, and only when it’s well deserved.`
+          content:
+            "You're Ms. Kalama, a warm instructional coach helping teachers improve AI prompts. Give users concise, brief coaching on how to improve their prompt. Provide praise if a prompt does not need much improvement to yield strong results.",
         },
-        {
-          role: "user",
-          content: userMessage
-        }
+        { role: "user", content: userPrompt },
       ],
-      model: "gpt-4"
+      max_tokens: 100,
     });
 
-    const reply = completion.choices[0].message.content;
-    res.json({ reply });
-  } catch (error) {
-    console.error("Error with OpenAI API:", error);
-    res.status(500).json({ reply: "Sorry, I couldn't process that. Try again!" });
+    // AI Output message
+    const outputRes = await openai.chat.completions.create({
+      model: "gpt-4",
+      messages: [
+        {
+          role: "system",
+          content:
+            "You are ChatGPT responding to the user's prompt as if generating output for a classroom use case. Respond with approximately 3 concise, short bullet points. Do not number the bullet points.",
+        },
+        { role: "user", content: userPrompt },
+      ],
+      max_tokens: 300,
+    });
+
+    const coaching = coachingRes.choices?.[0]?.message?.content?.trim() || "";
+    const output = outputRes.choices?.[0]?.message?.content?.trim() || "";
+
+    console.log("✅ Coaching Response:", coaching);
+    console.log("✅ Output Response:", output);
+
+    res.json({
+      coaching,
+      output,
+      complete: true,
+    });
+  } catch (err) {
+    console.error("❌ Error in /chat route:", err);
+    res
+      .status(500)
+      .json({ coaching: "Sorry, something went wrong.", output: "", complete: false });
   }
 });
 
 const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`✅ Server running on port ${PORT}`);
+});
+
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
