@@ -2,31 +2,32 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Ms. Kalama - Instructional Coach</title>
-  <link rel="stylesheet" href="styles.css" />
+  <title>Ms. Kalama Prompting Coach</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="chat-container">
-    <div class="header">
-      <h1>Practice with Ms. Kalama</h1>
-      <p>Write a helpful AI prompt to support Mr. Kumu’s classroom. When your prompt is strong, copy it and click Next.</p>
+  <div id="instructions">
+    <h2>Welcome!</h2>
+    <p>
+      I'm <strong>Ms. Kalama</strong>, your instructional coach. Practice writing AI prompts to help Mr. Kumu with lesson planning, assessments, or differentiation.
+      For each prompt, I’ll coach you and show what a tool like ChatGPT might generate.
+    </p>
+
+    <h3>Example Prompt:</h3>
+    <p><em>"Create a 5th grade lesson plan that includes scaffolds for multilingual learners and students with IEPs."</em></p>
+
+    <p><strong>Try your own prompt below!</strong></p>
+  </div>
+
+  <div id="chat-wrapper">
+    <div id="chat-container"></div>
+
+    <div id="input-area">
+      <input type="text" id="user-input" placeholder="Type your AI prompt here..." />
+      <button id="send-button">Send</button>
     </div>
-    <div id="chat-box" class="chat-box"></div>
 
-    <form id="chat-form" class="chat-form">
-      <input
-        type="text"
-        id="user-input"
-        placeholder="Type your prompt here..."
-        autocomplete="off"
-        required
-      />
-      <button type="submit">Send</button>
-    </form>
-
-    <button id="copy-button" style="display: none;">📋 Copy Prompt</button>
-    <div id="completed-message" class="completed-message"></div>
+    <button id="continue-btn" style="display:none;">Continue</button>
   </div>
 
   <script src="script.js"></script>
