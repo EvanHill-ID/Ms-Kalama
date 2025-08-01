@@ -1,41 +1,57 @@
-const chatBox = document.getElementById("chat-box");
 const userInput = document.getElementById("user-input");
-const sendBtn = document.getElementById("send-btn");
+const sendButton = document.getElementById("send-button");
+const chatContainer = document.getElementById("chat-container");
+const nextButton = document.getElementById("next-btn");
 
-function appendMessage(sender, text) {
-  const messageDiv = document.createElement("div");
-  messageDiv.classList.add("message", sender);
-  messageDiv.innerHTML = `<p>${text}</p>`;
-  chatBox.appendChild(messageDiv);
-  chatBox.scrollTop = chatBox.scrollHeight;
+function addMessage(content, className = "bot-message") {
+  const msg = document.createElement("div");
+  msg.className = className;
+  msg.innerHTML = content;
+  chatContainer.appendChild(msg);
+  chatContainer.scrollTop = chatContainer.scrollHeight;
 }
 
-async function sendMessage() {
-  const message = userInput.value.trim();
-  if (!message) return;
+function addCopyButton(promptText) {
+  const copyBtn = document.createElement("button");
+  copyBtn.textContent = "Copy Prompt";
+  copyBtn.className = "copy-btn";
+  copyBtn.onclick = () => {
+    navigator.clipboard.writeText(promptText);
+    copyBtn.textContent = "Copied!";
+    setTimeout(() => (copyBtn.textContent = "Copy Prompt"), 1500);
+  };
+  chatContainer.appendChild(copyBtn);
+}
 
-  appendMessage("user", message);
+sendButton.addEventListener("click", async () => {
+  const prompt = userInput.value.trim();
+  if (!prompt) return;
+
+  addMessage(prompt, "user-message");
   userInput.value = "";
 
   try {
-    const res = await fetch("/chat", {
+    const response = await fetch("/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message }),
+      body: JSON.stringify({ messages: [{ role: "user", content: prompt }] }),
     });
 
-    const data = await res.json();
-    appendMessage("bot", data.reply);
+    const { coaching, output, complete } = await response.json();
+
+    addMessage(`<strong>Ms. Kalama:</strong> ${coaching}`);
+    addMessage(`<strong>Sample AI Output:</strong><br><em>${output}</em>`);
+
+    if (coaching.includes("This is a strong prompt")) {
+      addCopyButton(prompt);
+      document.getElementById("next-btn").style.display = "block";
+    }
   } catch (err) {
-    appendMessage("bot", "Sorry, something went wrong.");
-    console.error("Error:", err);
+    console.error("Chat error:", err);
+    addMessage("Something went wrong. Please try again.");
   }
-}
+});
 
-sendBtn.addEventListener("click", sendMessage);
-
-userInput.addEventListener("keypress", (e) => {
-  if (e.key === "Enter") {
-    sendMessage();
-  }
+userInput.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") sendButton.click();
 });
