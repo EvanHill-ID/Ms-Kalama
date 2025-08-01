@@ -60,9 +60,7 @@ async function sendMessage() {
       appendMessage("kalama", data.coaching);
       appendOutput(data.output);
       appendCopyButton(message);
-      if (data.complete) {
-        continueButton.style.display = "block";
-      }
+  
     } else {
       appendMessage("kalama", "Something went wrong. Please try again.");
     }
