@@ -27,7 +27,13 @@
       <button id="send-button">Send</button>
     </div>
 
-    <button id="continue-btn" style="display:none;">Continue</button>
+    <!-- ✅ NEW: Copy button and success message -->
+    <div id="success-section" style="display:none; margin-top: 1em;">
+      <button id="copy-btn">📋 Copy Prompt</button>
+      <p><strong>Nice work!</strong> After copying your prompt, you're ready to move on. Click "Next."</p>
+    </div>
+
+    <button id="continue-btn" style="display:none;">Next</button>
   </div>
 
   <script src="script.js"></script>
