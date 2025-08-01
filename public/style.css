@@ -1,17 +1,19 @@
-/* Base layout */
+/* Reset and base styles */
 body {
   font-family: Arial, sans-serif;
   background-color: #f0f7f4;
   color: #333;
   margin: 0;
-  padding: 40px 20px;
-  display: flex;
-  justify-content: center;
+  padding: 40px 0;
+  display: block;
+  text-align: center;
 }
 
 main {
-  width: 100%;
   max-width: 700px;
+  margin: 0 auto;
+  padding: 0 20px;
+  text-align: left;
 }
 
 /* Instructions section */
@@ -23,7 +25,7 @@ main {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-/* Chat box */
+/* Chat box container */
 #chat-wrapper {
   background-color: #ffffff;
   border-radius: 12px;
@@ -37,7 +39,7 @@ main {
   margin-bottom: 20px;
 }
 
-/* Message styling */
+/* Chat messages */
 .message {
   margin-bottom: 12px;
   padding: 10px;
@@ -102,7 +104,7 @@ main {
   background-color: #fb8c00;
 }
 
-/* Copy button */
+/* Copy Prompt Button */
 #copy-button {
   margin-top: 12px;
   padding: 8px 16px;
@@ -120,7 +122,7 @@ main {
   background-color: #009973;
 }
 
-/* Animation */
+/* Fade-in animation */
 .fade-in {
   opacity: 0;
   animation: fadeIn ease 0.6s forwards;
