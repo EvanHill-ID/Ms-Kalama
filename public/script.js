@@ -1,76 +1,41 @@
-const chatContainer = document.getElementById("chat-container");
+const chatBox = document.getElementById("chat-box");
 const userInput = document.getElementById("user-input");
-const sendButton = document.getElementById("send-button");
+const sendBtn = document.getElementById("send-btn");
 
-function scrollToBottom() {
-  chatContainer.scrollTop = chatContainer.scrollHeight;
-}
-
-function addMessage(sender, text) {
+function appendMessage(sender, text) {
   const messageDiv = document.createElement("div");
-  messageDiv.className = sender === "user" ? "user-message" : "chatbot-message";
-  messageDiv.innerText = text;
-  chatContainer.appendChild(messageDiv);
-  scrollToBottom();
+  messageDiv.classList.add("message", sender);
+  messageDiv.innerHTML = `<p>${text}</p>`;
+  chatBox.appendChild(messageDiv);
+  chatBox.scrollTop = chatBox.scrollHeight;
 }
 
 async function sendMessage() {
-  const input = userInput.value.trim();
-  if (!input) return;
+  const message = userInput.value.trim();
+  if (!message) return;
 
-  addMessage("user", input);
+  appendMessage("user", message);
   userInput.value = "";
 
   try {
-    const response = await fetch("/chat", {
+    const res = await fetch("/chat", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ message: input }),
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message }),
     });
 
-    const data = await response.json();
-    const reply = data.reply;
-    addMessage("chatbot", reply);
-
-    // If the response includes a strong prompt confirmation, show the copy prompt UI
-    if (reply.toLowerCase().includes("this is a strong prompt")) {
-      showSuccessMessage(input);
-    }
-  } catch (error) {
-    console.error("Error:", error);
-    addMessage("chatbot", "Oops! Something went wrong. Try again.");
+    const data = await res.json();
+    appendMessage("bot", data.reply);
+  } catch (err) {
+    appendMessage("bot", "Sorry, something went wrong.");
+    console.error("Error:", err);
   }
 }
 
-function showSuccessMessage(userPrompt) {
-  const feedback = document.createElement("div");
-  feedback.className = "chatbot-message";
-  feedback.innerHTML = `
-    ✅ <strong>This is a strong prompt!</strong><br>
-    You can <button id="copyPromptBtn">📋 Copy Prompt</button> and then click <strong>Next</strong> in the course to move on.<br>
-    If you'd like to refine further, you're welcome to keep going!
-  `;
-
-  chatContainer.appendChild(feedback);
-  scrollToBottom();
-
-  // Enable copying the final prompt
-  const copyButton = document.getElementById("copyPromptBtn");
-  copyButton.addEventListener("click", () => {
-    navigator.clipboard.writeText(userPrompt).then(() => {
-      alert("Prompt copied to clipboard!");
-    });
-  });
-}
-
-// Listeners
-sendButton.addEventListener("click", sendMessage);
+sendBtn.addEventListener("click", sendMessage);
 
 userInput.addEventListener("keypress", (e) => {
   if (e.key === "Enter") {
-    e.preventDefault();
     sendMessage();
   }
 });
